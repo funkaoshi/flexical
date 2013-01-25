@@ -138,20 +138,25 @@ var checkZendesk = function (client, emitter) {
 
 
 var checkSdeDogfood = function (emitter) {
+    var token = config.sde.token.split('@')
+    var api_token = token[0]
+    var server = token[1]
+    
     var HEADERS = {
-        'X-API-TOKEN': config['sde']['token'],
+        'X-API-TOKEN': api_token,
         'Accept': 'application/json'
     }
     request.get({ 
-        // TODO: Don't hardcode the URLS
-        url: "https://m1.sdelements.com/api/projects/?application=78",
+        url: "https://" + server + "/api/projects/?application=" + config.sde.application,
         headers: HEADERS,
         json: true,
     }, function (error, response, body) {
+        // Display stats for oldest active dog food project
+        // There really should be only one, but we might start a new one
+        // before deploying the last build.
         var project = _(body.projects).min(function (i) { return i.name; });
         request.get({
-            // TODO: Don't hardcode the URLS
-            url: "https://m1.sdelements.com/api/tasks/?project=" + project.id,
+            url: "https://" + server + "/api/tasks/?project=" + project.id,
             headers: HEADERS,
             json: true  
         }, function (error, response, body) {
