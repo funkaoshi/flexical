@@ -137,6 +137,32 @@ var checkZendesk = function (client, emitter) {
 }
 
 
+var checkSdeDogfood = function (emitter) {
+    var HEADERS = {
+        'X-API-TOKEN': config['sde']['token'],
+        'Accept': 'application/json'
+    }
+    request.get({ 
+        // TODO: Don't hardcode the URLS
+        url: "https://m1.sdelements.com/api/projects/?application=78",
+        headers: HEADERS,
+        json: true,
+    }, function (error, response, body) {
+        var project = _(body.projects).min(function (i) { return i.name; });
+        request.get({
+            // TODO: Don't hardcode the URLS
+            url: "https://m1.sdelements.com/api/tasks/?project=" + project.id,
+            headers: HEADERS,
+            json: true  
+        }, function (error, response, body) {
+            var todos = _(body.tasks).where({status: 'TODO'});
+            var counts = _(todos).countBy(function (i) { return i.phase; });
+            emitter(counts)
+        })
+    });
+}
+
+
 module.exports = {
     'zendesk': {
         interval: 15 * 60 * 1000, // check every 15 minutes
