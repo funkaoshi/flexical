@@ -194,13 +194,11 @@ var sdeStats = function (emitter) {
     async.parallel(requests, function(err, results) {
         var totals = {
             'users': 0,
-            'projects': 0,
-            'active_users': 0
+            'projects': 0
         };
         _(results).each(function (result) {
             totals.users += result.total_users;
             totals.projects += result.total_projects;
-            totals.active_users += result.active_users;
         });
 
         emitter(totals);
