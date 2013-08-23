@@ -182,7 +182,7 @@ var sdeStats = function (emitter) {
                 'Accept': 'application/json'
             };
             request.get({
-                url: "http://" + server + "/api/stats/",
+                url: "https://" + server + "/api/stats/",
                 headers: HEADERS,
                 json: true
             }, function (error, response, body) {
